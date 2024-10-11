@@ -39,8 +39,8 @@ import { CommentsController } from './controllers/comments.controller';
         Product,
         User,
         CartItem,
-        Order, // Add Order model to models array
-        OrderItem, // Add OrderItem model to models array
+        Order,
+        OrderItem,
         Comment,
       ],
       autoLoadModels: true,

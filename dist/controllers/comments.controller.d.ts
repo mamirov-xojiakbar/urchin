@@ -1,4 +1,4 @@
-import { CommentsService } from '../services/comments.service';
+import { CommentsService } from "../services/comments.service";
 export declare class CommentsController {
     private readonly commentsService;
     constructor(commentsService: CommentsService);

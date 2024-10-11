@@ -18,6 +18,7 @@ const comments_service_1 = require("../services/comments.service");
 const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("../guards/roles.guard");
 const roles_decorator_1 = require("../decorators/roles.decorator");
+const swagger_1 = require("@nestjs/swagger");
 let CommentsController = class CommentsController {
     constructor(commentsService) {
         this.commentsService = commentsService;
@@ -28,19 +29,43 @@ let CommentsController = class CommentsController {
 };
 exports.CommentsController = CommentsController;
 __decorate([
-    (0, common_1.Post)('add/:productId'),
-    (0, roles_decorator_1.Roles)('user', 'admin'),
-    __param(0, (0, common_1.Param)('productId')),
-    __param(1, (0, common_1.Body)('userId')),
-    __param(2, (0, common_1.Body)('text')),
-    __param(3, (0, common_1.Body)('grade')),
+    (0, common_1.Post)("add/:productId"),
+    (0, roles_decorator_1.Roles)("user", "admin"),
+    (0, swagger_1.ApiOperation)({ summary: "Add a comment to a product" }),
+    (0, swagger_1.ApiParam)({
+        name: "productId",
+        type: "integer",
+        description: "ID of the product",
+    }),
+    (0, swagger_1.ApiBody)({
+        description: "Comment details",
+        schema: {
+            type: "object",
+            properties: {
+                userId: { type: "integer", example: 1 },
+                text: { type: "string", example: "This product is great!" },
+                grade: {
+                    type: "integer",
+                    example: 5,
+                    description: "Rating between 1 and 5",
+                },
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: "Comment added successfully." }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: "Forbidden." }),
+    __param(0, (0, common_1.Param)("productId")),
+    __param(1, (0, common_1.Body)("userId")),
+    __param(2, (0, common_1.Body)("text")),
+    __param(3, (0, common_1.Body)("grade")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Number, String, Number]),
     __metadata("design:returntype", void 0)
 ], CommentsController.prototype, "addComment", null);
 exports.CommentsController = CommentsController = __decorate([
-    (0, common_1.Controller)('comments'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.Controller)("comments"),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard),
+    (0, swagger_1.ApiTags)("Comments"),
     __metadata("design:paramtypes", [comments_service_1.CommentsService])
 ], CommentsController);
 //# sourceMappingURL=comments.controller.js.map

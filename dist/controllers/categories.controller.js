@@ -18,6 +18,7 @@ const categories_service_1 = require("../services/categories.service");
 const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("../guards/roles.guard");
 const roles_decorator_1 = require("../decorators/roles.decorator");
+const swagger_1 = require("@nestjs/swagger");
 let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
@@ -31,25 +32,51 @@ let CategoriesController = class CategoriesController {
 };
 exports.CategoriesController = CategoriesController;
 __decorate([
-    (0, common_1.Post)('add'),
-    (0, roles_decorator_1.Roles)('admin'),
-    __param(0, (0, common_1.Body)('name')),
-    __param(1, (0, common_1.Body)('parentId')),
+    (0, common_1.Post)("add"),
+    (0, roles_decorator_1.Roles)("admin"),
+    (0, swagger_1.ApiOperation)({ summary: "Create a new category" }),
+    (0, swagger_1.ApiBody)({
+        description: "Category data with multilingual names and optional parentId",
+        schema: {
+            type: "object",
+            properties: {
+                name: {
+                    type: "object",
+                    additionalProperties: { type: "string" },
+                    example: { en: "Electronics", uz: "Elektronika", ru: "Электроника" },
+                },
+                parentId: { type: "integer", nullable: true, example: 1 },
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: "Category created successfully." }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: "Forbidden." }),
+    __param(0, (0, common_1.Body)("name")),
+    __param(1, (0, common_1.Body)("parentId")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", void 0)
 ], CategoriesController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)('fetch'),
-    (0, roles_decorator_1.Roles)('admin', 'user'),
-    __param(0, (0, common_1.Query)('lang')),
+    (0, common_1.Get)("fetch"),
+    (0, roles_decorator_1.Roles)("admin", "user"),
+    (0, swagger_1.ApiOperation)({ summary: "Fetch all categories in the specified language" }),
+    (0, swagger_1.ApiQuery)({
+        name: "lang",
+        required: false,
+        description: 'Language code to fetch categories in (e.g., "en", "uz", "ru")',
+    }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "Categories fetched successfully." }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: "Categories not found." }),
+    __param(0, (0, common_1.Query)("lang")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "getCategories", null);
 exports.CategoriesController = CategoriesController = __decorate([
-    (0, common_1.Controller)('categories'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.Controller)("categories"),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard),
+    (0, swagger_1.ApiTags)("Categories"),
     __metadata("design:paramtypes", [categories_service_1.CategoriesService])
 ], CategoriesController);
 //# sourceMappingURL=categories.controller.js.map

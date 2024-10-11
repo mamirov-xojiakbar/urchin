@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersController = void 0;
 const common_1 = require("@nestjs/common");
 const order_service_1 = require("../services/order.service");
+const swagger_1 = require("@nestjs/swagger");
 let OrdersController = class OrdersController {
     constructor(ordersService) {
         this.ordersService = ordersService;
@@ -31,29 +32,62 @@ let OrdersController = class OrdersController {
 };
 exports.OrdersController = OrdersController;
 __decorate([
-    (0, common_1.Post)('create/:userId'),
-    __param(0, (0, common_1.Param)('userId')),
+    (0, common_1.Post)("create/:userId"),
+    (0, swagger_1.ApiOperation)({ summary: "Create a new order for a user" }),
+    (0, swagger_1.ApiParam)({ name: "userId", type: "integer", description: "ID of the user" }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: "Order created successfully." }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: "Forbidden." }),
+    __param(0, (0, common_1.Param)("userId")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "createOrder", null);
 __decorate([
-    (0, common_1.Get)(':userId'),
-    __param(0, (0, common_1.Param)('userId')),
+    (0, common_1.Get)(":userId"),
+    (0, swagger_1.ApiOperation)({ summary: "Get all orders for a user" }),
+    (0, swagger_1.ApiParam)({ name: "userId", type: "integer", description: "ID of the user" }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "Orders fetched successfully." }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: "Orders not found." }),
+    __param(0, (0, common_1.Param)("userId")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "getUserOrders", null);
 __decorate([
-    (0, common_1.Post)('status/:orderId'),
-    __param(0, (0, common_1.Param)('orderId')),
-    __param(1, (0, common_1.Body)('status')),
+    (0, common_1.Post)("status/:orderId"),
+    (0, swagger_1.ApiOperation)({ summary: "Update the status of an order" }),
+    (0, swagger_1.ApiParam)({
+        name: "orderId",
+        type: "integer",
+        description: "ID of the order",
+    }),
+    (0, swagger_1.ApiBody)({
+        description: "Order status data",
+        schema: {
+            type: "object",
+            properties: {
+                status: {
+                    type: "string",
+                    example: "Shipped",
+                    description: "New order status",
+                },
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: "Order status updated successfully.",
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: "Order not found." }),
+    __param(0, (0, common_1.Param)("orderId")),
+    __param(1, (0, common_1.Body)("status")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "updateOrderStatus", null);
 exports.OrdersController = OrdersController = __decorate([
-    (0, common_1.Controller)('orders'),
+    (0, common_1.Controller)("orders"),
+    (0, swagger_1.ApiTags)("Orders"),
     __metadata("design:paramtypes", [order_service_1.OrdersService])
 ], OrdersController);
 //# sourceMappingURL=order.controller.js.map

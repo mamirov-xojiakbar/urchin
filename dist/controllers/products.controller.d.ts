@@ -1,20 +1,9 @@
-import { ProductsService } from '../services/products.service';
-import { Product } from '../models/product.model';
+import { ProductsService } from "../services/products.service";
+import { Product } from "../models/product.model";
 export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
-    create(dto: {
-        name: object;
-        description: object;
-        price: number;
-        categoryId: number;
-        code: string;
-        dimensions: string;
-        cubicVolume: number;
-        bruttoWeight: number;
-        nettoWeight: number;
-        minOrderQuantity: number;
-    }): Promise<Product>;
+    create(dto: Record<string, any>): Promise<Product>;
     findByCategory(id: number, language: string, limit?: number, offset?: number): Promise<{
         category: {
             id: any;
@@ -126,7 +115,7 @@ export declare class ProductsController {
         sequelize: import("sequelize").Sequelize;
         _model: import("sequelize").Model<Product, Product>;
     }[]>;
-    findProductsByFilter(categoryId: number, limit: number, offset: number, language?: string, sortBy?: 'price' | 'salesCount' | 'views' | 'rating', sortOrder?: 'ASC' | 'DESC'): Promise<{
+    findProductsByFilter(categoryId: number, limit: number, offset: number, language?: string, sortBy?: "price" | "salesCount" | "views" | "rating", sortOrder?: "ASC" | "DESC"): Promise<{
         name: any;
         description: any;
         bruttoWeight: number;

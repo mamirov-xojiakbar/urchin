@@ -1,4 +1,4 @@
-import { CartsService } from '../services/carts.service';
+import { CartsService } from "../services/carts.service";
 export declare class CartsController {
     private readonly cartsService;
     constructor(cartsService: CartsService);

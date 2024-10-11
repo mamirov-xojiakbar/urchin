@@ -18,6 +18,7 @@ const products_service_1 = require("../services/products.service");
 const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("../guards/roles.guard");
 const roles_decorator_1 = require("../decorators/roles.decorator");
+const swagger_1 = require("@nestjs/swagger");
 let ProductsController = class ProductsController {
     constructor(productsService) {
         this.productsService = productsService;
@@ -31,102 +32,229 @@ let ProductsController = class ProductsController {
     findBestSellers(limit, lang, offset = 0) {
         const parsedLimit = parseInt(limit, 10);
         if (isNaN(parsedLimit)) {
-            throw new common_1.BadRequestException('Limit must be a valid number');
+            throw new common_1.BadRequestException("Limit must be a valid number");
         }
-        const language = lang || 'uz';
+        const language = lang || "uz";
         return this.productsService.findBestSellers(parsedLimit, language, offset);
     }
     async addView(id) {
         await this.productsService.addViews(id);
-        return { message: 'View added successfully' };
+        return { message: "View added successfully" };
     }
     findTopViewed(limit, lang, offset = 0) {
         const parsedLimit = parseInt(limit, 10);
         if (isNaN(parsedLimit)) {
-            throw new common_1.BadRequestException('Limit must be a valid number');
+            throw new common_1.BadRequestException("Limit must be a valid number");
         }
-        const language = lang || 'uz';
+        const language = lang || "uz";
         return this.productsService.findTopViewed(parsedLimit, language, offset);
     }
-    async findProductsByFilter(categoryId, limit, offset, language = 'en', sortBy = 'price', sortOrder = 'ASC') {
+    async findProductsByFilter(categoryId, limit, offset, language = "en", sortBy = "price", sortOrder = "ASC") {
         return this.productsService.findProductsByFilter(categoryId, limit, offset, language, sortBy, sortOrder);
     }
-    async findTopRatedProducts(limit = 10, offset = 0, language = 'en') {
+    async findTopRatedProducts(limit = 10, offset = 0, language = "en") {
         return this.productsService.findTopRatedProducts(limit, language, offset);
     }
 };
 exports.ProductsController = ProductsController;
 __decorate([
-    (0, common_1.Post)('add'),
-    (0, roles_decorator_1.Roles)('admin'),
+    (0, common_1.Post)("add"),
+    (0, roles_decorator_1.Roles)("admin"),
+    (0, swagger_1.ApiOperation)({ summary: "Create a new product" }),
+    (0, swagger_1.ApiBody)({
+        description: "Product details",
+        schema: {
+            type: "object",
+            properties: {
+                name: {
+                    type: "object",
+                    additionalProperties: { type: "string" },
+                    example: { en: "Phone", uz: "Telefon", ru: "Телефон" },
+                },
+                description: {
+                    type: "object",
+                    additionalProperties: { type: "string" },
+                    example: {
+                        en: "High quality phone",
+                        uz: "Yuqori sifatli telefon",
+                        ru: "Высококачественный телефон",
+                    },
+                },
+                price: { type: "number", example: 199.99 },
+                categoryId: { type: "number", example: 1 },
+                code: { type: "string", example: "P123" },
+                dimensions: { type: "string", example: "10x20x5cm" },
+                cubicVolume: { type: "number", example: 100 },
+                bruttoWeight: { type: "number", example: 1.5 },
+                nettoWeight: { type: "number", example: 1.4 },
+                minOrderQuantity: { type: "number", example: 1 },
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({ status: 201, description: "Product created successfully." }),
+    (0, swagger_1.ApiResponse)({ status: 403, description: "Forbidden." }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)('category/:id'),
-    (0, roles_decorator_1.Roles)('admin', 'user'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Query)('lang')),
-    __param(2, (0, common_1.Query)('limit')),
-    __param(3, (0, common_1.Query)('offset')),
+    (0, common_1.Get)("category/:id"),
+    (0, roles_decorator_1.Roles)("admin", "user"),
+    (0, swagger_1.ApiOperation)({ summary: "Find products by category" }),
+    (0, swagger_1.ApiParam)({ name: "id", type: "integer", description: "ID of the category" }),
+    (0, swagger_1.ApiQuery)({
+        name: "lang",
+        required: false,
+        description: "Language code (optional)",
+        example: "en",
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: "limit",
+        required: false,
+        description: "Limit the number of results",
+        example: 10,
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: "offset",
+        required: false,
+        description: "Offset the results",
+        example: 0,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "Products fetched successfully." }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: "Products not found." }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Query)("lang")),
+    __param(2, (0, common_1.Query)("limit")),
+    __param(3, (0, common_1.Query)("offset")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, String, Number, Number]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "findByCategory", null);
 __decorate([
-    (0, common_1.Get)('best-sellers'),
-    (0, roles_decorator_1.Roles)('admin', 'user'),
-    __param(0, (0, common_1.Query)('limit')),
-    __param(1, (0, common_1.Query)('lang')),
-    __param(2, (0, common_1.Query)('offset')),
+    (0, common_1.Get)("best-sellers"),
+    (0, roles_decorator_1.Roles)("admin", "user"),
+    (0, swagger_1.ApiOperation)({ summary: "Get best-selling products" }),
+    (0, swagger_1.ApiQuery)({
+        name: "limit",
+        description: "Limit the number of results",
+        example: "10",
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: "lang",
+        description: "Language code (optional)",
+        example: "en",
+    }),
+    (0, swagger_1.ApiQuery)({ name: "offset", description: "Offset the results", example: 0 }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "Best-selling products retrieved." }),
+    __param(0, (0, common_1.Query)("limit")),
+    __param(1, (0, common_1.Query)("lang")),
+    __param(2, (0, common_1.Query)("offset")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Number]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findBestSellers", null);
 __decorate([
-    (0, roles_decorator_1.Roles)('admin'),
-    (0, common_1.Post)(':id/add-view'),
-    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    (0, roles_decorator_1.Roles)("admin"),
+    (0, common_1.Post)(":id/add-view"),
+    (0, swagger_1.ApiOperation)({ summary: "Add a view to a product" }),
+    (0, swagger_1.ApiParam)({ name: "id", description: "Product ID" }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "View added successfully." }),
+    __param(0, (0, common_1.Param)("id", common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "addView", null);
 __decorate([
-    (0, common_1.Get)('top-viewed'),
-    (0, roles_decorator_1.Roles)('admin', 'user'),
-    __param(0, (0, common_1.Query)('limit')),
-    __param(1, (0, common_1.Query)('lang')),
-    __param(2, (0, common_1.Query)('offset')),
+    (0, common_1.Get)("top-viewed"),
+    (0, roles_decorator_1.Roles)("admin", "user"),
+    (0, swagger_1.ApiOperation)({ summary: "Get most-viewed products" }),
+    (0, swagger_1.ApiQuery)({
+        name: "limit",
+        description: "Limit the number of results",
+        example: "10",
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: "lang",
+        description: "Language code (optional)",
+        example: "en",
+    }),
+    (0, swagger_1.ApiQuery)({ name: "offset", description: "Offset the results", example: 0 }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "Top viewed products retrieved." }),
+    __param(0, (0, common_1.Query)("limit")),
+    __param(1, (0, common_1.Query)("lang")),
+    __param(2, (0, common_1.Query)("offset")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, Number]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findTopViewed", null);
 __decorate([
-    (0, common_1.Get)('filter'),
-    __param(0, (0, common_1.Query)('categoryId')),
-    __param(1, (0, common_1.Query)('limit')),
-    __param(2, (0, common_1.Query)('offset')),
-    __param(3, (0, common_1.Query)('language')),
-    __param(4, (0, common_1.Query)('sortBy')),
-    __param(5, (0, common_1.Query)('sortOrder')),
+    (0, common_1.Get)("filter"),
+    (0, swagger_1.ApiOperation)({ summary: "Find products by filter" }),
+    (0, swagger_1.ApiQuery)({ name: "categoryId", description: "Category ID", required: true }),
+    (0, swagger_1.ApiQuery)({
+        name: "limit",
+        description: "Limit the number of results",
+        example: 10,
+    }),
+    (0, swagger_1.ApiQuery)({ name: "offset", description: "Offset the results", example: 0 }),
+    (0, swagger_1.ApiQuery)({
+        name: "language",
+        description: "Language code (optional)",
+        example: "en",
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: "sortBy",
+        description: "Sorting criteria",
+        example: "price",
+        enum: ["price", "salesCount", "views", "rating"],
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: "sortOrder",
+        description: "Sorting order",
+        example: "ASC",
+        enum: ["ASC", "DESC"],
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: "Filtered products retrieved successfully.",
+    }),
+    __param(0, (0, common_1.Query)("categoryId")),
+    __param(1, (0, common_1.Query)("limit")),
+    __param(2, (0, common_1.Query)("offset")),
+    __param(3, (0, common_1.Query)("language")),
+    __param(4, (0, common_1.Query)("sortBy")),
+    __param(5, (0, common_1.Query)("sortOrder")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Number, Number, String, String, String]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "findProductsByFilter", null);
 __decorate([
-    (0, common_1.Get)('top-rated'),
-    __param(0, (0, common_1.Query)('limit')),
-    __param(1, (0, common_1.Query)('offset')),
-    __param(2, (0, common_1.Query)('language')),
+    (0, common_1.Get)("top-rated"),
+    (0, swagger_1.ApiOperation)({ summary: "Get top-rated products" }),
+    (0, swagger_1.ApiQuery)({
+        name: "limit",
+        description: "Limit the number of results",
+        example: 10,
+    }),
+    (0, swagger_1.ApiQuery)({ name: "offset", description: "Offset the results", example: 0 }),
+    (0, swagger_1.ApiQuery)({
+        name: "language",
+        description: "Language code (optional)",
+        example: "en",
+    }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "Top-rated products retrieved." }),
+    __param(0, (0, common_1.Query)("limit")),
+    __param(1, (0, common_1.Query)("offset")),
+    __param(2, (0, common_1.Query)("language")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Number, String]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "findTopRatedProducts", null);
 exports.ProductsController = ProductsController = __decorate([
-    (0, common_1.Controller)('products'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt'), roles_guard_1.RolesGuard),
+    (0, common_1.Controller)("products"),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard),
+    (0, swagger_1.ApiTags)("Products"),
     __metadata("design:paramtypes", [products_service_1.ProductsService])
 ], ProductsController);
 //# sourceMappingURL=products.controller.js.map
