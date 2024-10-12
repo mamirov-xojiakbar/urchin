@@ -10,9 +10,10 @@ import {
   ApiBody,
   ApiQuery,
 } from "@nestjs/swagger";
+import { IpGuard } from "../guards/ip.adress.guard";
 
 @Controller("categories")
-@UseGuards(AuthGuard("jwt"), RolesGuard)
+@UseGuards(AuthGuard("jwt"), RolesGuard, IpGuard)
 @ApiTags("Categories") // Grouping in Swagger UI
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}

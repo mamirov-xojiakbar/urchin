@@ -8,6 +8,8 @@ import {
   BadRequestException,
   UseGuards,
   ParseIntPipe,
+  UploadedFiles,
+  UseInterceptors,
 } from "@nestjs/common";
 import { ProductsService } from "../services/products.service";
 import { AuthGuard } from "@nestjs/passport";
@@ -22,49 +24,51 @@ import {
   ApiQuery,
   ApiBody,
 } from "@nestjs/swagger";
+import { IpGuard } from "../guards/ip.adress.guard";
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { extname } from "path";
 
 @Controller("products")
-@UseGuards(AuthGuard("jwt"), RolesGuard)
+@UseGuards(AuthGuard("jwt"), RolesGuard, IpGuard)
 @ApiTags("Products") // Swagger group for products
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post("add")
-  @Roles("admin")
-  @ApiOperation({ summary: "Create a new product" })
-  @ApiBody({
-    description: "Product details",
-    schema: {
-      type: "object",
-      properties: {
-        name: {
-          type: "object",
-          additionalProperties: { type: "string" },
-          example: { en: "Phone", uz: "Telefon", ru: "Телефон" },
+  @UseInterceptors(
+    FilesInterceptor("images", 10, {
+      storage: diskStorage({
+        destination: "./uploads/products",
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
         },
-        description: {
-          type: "object",
-          additionalProperties: { type: "string" },
-          example: {
-            en: "High quality phone",
-            uz: "Yuqori sifatli telefon",
-            ru: "Высококачественный телефон",
-          },
-        },
-        price: { type: "number", example: 199.99 },
-        categoryId: { type: "number", example: 1 },
-        code: { type: "string", example: "P123" },
-        dimensions: { type: "string", example: "10x20x5cm" },
-        cubicVolume: { type: "number", example: 100 },
-        bruttoWeight: { type: "number", example: 1.5 },
-        nettoWeight: { type: "number", example: 1.4 },
-        minOrderQuantity: { type: "number", example: 1 },
+      }),
+      limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB file limit
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+          cb(new BadRequestException("Only image files are allowed!"), false);
+        } else {
+          cb(null, true);
+        }
       },
-    },
-  })
-  @ApiResponse({ status: 201, description: "Product created successfully." })
-  @ApiResponse({ status: 403, description: "Forbidden." })
-  create(@Body() dto: Record<string, any>) {
+    })
+  )
+  async create(
+    @Body() dto: any,
+    @UploadedFiles() images
+  ) {
+    if (!images || images.length === 0) {
+      throw new BadRequestException("At least one image file is required.");
+    }
+
+    // Map the file names (image paths) and store them in the database
+    const imagePaths = images.map(
+      (file) => `uploads/products/${file.filename}`
+    );
     return this.productsService.create(
       dto.name,
       dto.description,
@@ -75,7 +79,8 @@ export class ProductsController {
       dto.cubicVolume,
       dto.bruttoWeight,
       dto.nettoWeight,
-      dto.minOrderQuantity
+      dto.minOrderQuantity,
+      images
     );
   }
 

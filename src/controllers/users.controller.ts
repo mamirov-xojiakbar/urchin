@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, UseGuards } from "@nestjs/common";
+import { Controller, Post, Body, Get, Param, UseGuards, Req } from "@nestjs/common";
 import { UsersService } from "../services/users.service";
 import { AuthGuard } from "@nestjs/passport";
 import { RolesGuard } from "../guards/roles.guard";
@@ -10,6 +10,9 @@ import {
   ApiParam,
   ApiBody,
 } from "@nestjs/swagger";
+import { Request, request } from "express";
+import { IpGuard } from "../guards/ip.adress.guard";
+import { log } from "console";
 
 @Controller("users")
 @ApiTags("Users") // Swagger group for users
@@ -48,15 +51,29 @@ export class UsersController {
   })
   @ApiResponse({ status: 200, description: "User logged in successfully." })
   @ApiResponse({ status: 401, description: "Invalid credentials." })
-  async login(@Body() dto: { username: string; password: string }) {
+  async login(
+    @Body() dto: { username: string; password: string },
+    @Req() req: Request
+  ) {
     const user = await this.usersService.validate(dto.username, dto.password);
     if (!user) {
       throw new Error("Invalid credentials");
     }
-    return this.usersService.login(user);
+    return this.usersService.login(user, req);
   }
 
-  @UseGuards(AuthGuard("jwt"), RolesGuard)
+  @UseGuards(AuthGuard("jwt"), RolesGuard, IpGuard)
+  @Roles("admin", "user")
+  @Get(":id")
+  @ApiOperation({ summary: "Get user datas by user ID" })
+  @ApiParam({ name: "id", description: "User ID" })
+  @ApiResponse({ status: 200, description: "User datas fetched successfully" })
+  @ApiResponse({ status: 400, description: "User not found" })
+  async getUserByID(@Param("id") id: number) {
+    return this.usersService.getUserByID(id);
+  }
+
+  @UseGuards(AuthGuard("jwt"), RolesGuard, IpGuard)
   @Roles("admin", "user")
   @Get(":id/comments")
   @ApiOperation({ summary: "Get comments of a user by ID" })

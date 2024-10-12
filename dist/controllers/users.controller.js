@@ -19,6 +19,7 @@ const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("../guards/roles.guard");
 const roles_decorator_1 = require("../decorators/roles.decorator");
 const swagger_1 = require("@nestjs/swagger");
+const ip_adress_guard_1 = require("../guards/ip.adress.guard");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -26,12 +27,15 @@ let UsersController = class UsersController {
     create(dto) {
         return this.usersService.create(dto.username, dto.password);
     }
-    async login(dto) {
+    async login(dto, req) {
         const user = await this.usersService.validate(dto.username, dto.password);
         if (!user) {
             throw new Error("Invalid credentials");
         }
-        return this.usersService.login(user);
+        return this.usersService.login(user, req);
+    }
+    async getUserByID(id) {
+        return this.usersService.getUserByID(id);
     }
     async getUserComments(id) {
         return this.usersService.getUserComments(id);
@@ -77,12 +81,26 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: "User logged in successfully." }),
     (0, swagger_1.ApiResponse)({ status: 401, description: "Invalid credentials." }),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "login", null);
 __decorate([
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard, ip_adress_guard_1.IpGuard),
+    (0, roles_decorator_1.Roles)("admin", "user"),
+    (0, common_1.Get)(":id"),
+    (0, swagger_1.ApiOperation)({ summary: "Get user datas by user ID" }),
+    (0, swagger_1.ApiParam)({ name: "id", description: "User ID" }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: "User datas fetched successfully" }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: "User not found" }),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getUserByID", null);
+__decorate([
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard, ip_adress_guard_1.IpGuard),
     (0, roles_decorator_1.Roles)("admin", "user"),
     (0, common_1.Get)(":id/comments"),
     (0, swagger_1.ApiOperation)({ summary: "Get comments of a user by ID" }),

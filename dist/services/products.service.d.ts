@@ -1,12 +1,12 @@
-import { Product } from '../models/product.model';
-import { Category } from '../models/category.model';
-import { Comment } from '../models/comment.model';
+import { Product } from "../models/product.model";
+import { Category } from "../models/category.model";
+import { Comment } from "../models/comment.model";
 export declare class ProductsService {
     private productModel;
     private categoryModel;
     private commentModel;
     constructor(productModel: typeof Product, categoryModel: typeof Category, commentModel: typeof Comment);
-    create(name: object, description: object, price: number, categoryId: number, code: string, dimensions: string, cubicVolume: number, bruttoWeight: number, nettoWeight: number, minOrderQuantity: number): Promise<Product>;
+    create(name: object, description: object, price: number, categoryId: number, code: string, dimensions: string, cubicVolume: number, bruttoWeight: number, nettoWeight: number, minOrderQuantity: number, images: string[]): Promise<Product>;
     findByCategory(categoryId: number, language: string, limit: number, offset: number): Promise<{
         category: {
             id: any;
@@ -31,6 +31,7 @@ export declare class ProductsService {
             }[];
             averageGrade: number;
             totalComments: number;
+            images: string[];
             price: number;
             categoryId: number;
             views: number;
@@ -59,6 +60,7 @@ export declare class ProductsService {
         }[];
         averageGrade: number;
         totalComments: number;
+        images: string[];
         price: number;
         categoryId: number;
         code: string;
@@ -93,6 +95,7 @@ export declare class ProductsService {
         }[];
         averageGrade: number;
         totalComments: number;
+        images: string[];
         price: number;
         categoryId: number;
         code: string;
@@ -117,11 +120,12 @@ export declare class ProductsService {
         _model: import("sequelize").Model<Product, Product>;
     }[]>;
     5: any;
-    findProductsByFilter(categoryId: number, limit: number, offset: number, language: string, sortBy: 'price' | 'salesCount' | 'views' | 'rating' | 'bruttoWeight' | 'nettoWeight', sortOrder: 'ASC' | 'DESC', code?: string, minCubicVolume?: number): Promise<{
+    findProductsByFilter(categoryId: number, limit: number, offset: number, language: string, sortBy: "price" | "salesCount" | "views" | "rating" | "bruttoWeight" | "nettoWeight", sortOrder: "ASC" | "DESC", code?: string, minCubicVolume?: number): Promise<{
         name: any;
         description: any;
         bruttoWeight: number;
         nettoWeight: number;
+        images: string[];
         price: number;
         categoryId: number;
         code: string;

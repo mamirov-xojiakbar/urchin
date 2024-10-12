@@ -26,6 +26,13 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.JSONB,
+        allowNull: true,
+    }),
+    __metadata("design:type", Array)
+], Product.prototype, "images", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.JSONB,
         allowNull: false,
     }),
     __metadata("design:type", Object)

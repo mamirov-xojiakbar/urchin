@@ -18,9 +18,10 @@ import {
   ApiBody,
   ApiParam,
 } from "@nestjs/swagger";
+import { IpGuard } from "../guards/ip.adress.guard";
 
 @Controller("cart")
-@UseGuards(AuthGuard("jwt"), RolesGuard)
+@UseGuards(AuthGuard("jwt"), RolesGuard, IpGuard)
 @ApiTags("Cart") // Add tag for grouping in Swagger UI
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}

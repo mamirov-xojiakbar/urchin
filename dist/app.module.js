@@ -67,8 +67,7 @@ exports.AppModule = AppModule = __decorate([
             ]),
             passport_1.PassportModule,
             jwt_1.JwtModule.register({
-                secret: 'your_jwt_secret',
-                signOptions: { expiresIn: '60m' },
+                secret: 'your_jwt_secret'
             }),
         ],
         providers: [

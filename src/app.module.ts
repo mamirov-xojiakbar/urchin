@@ -57,8 +57,7 @@ import { CommentsController } from './controllers/comments.controller';
     ]),
     PassportModule,
     JwtModule.register({
-      secret: 'your_jwt_secret',
-      signOptions: { expiresIn: '60m' },
+      secret: 'your_jwt_secret'
     }),
   ],
   providers: [

@@ -19,6 +19,7 @@ const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("../guards/roles.guard");
 const roles_decorator_1 = require("../decorators/roles.decorator");
 const swagger_1 = require("@nestjs/swagger");
+const ip_adress_guard_1 = require("../guards/ip.adress.guard");
 let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
@@ -75,7 +76,7 @@ __decorate([
 ], CategoriesController.prototype, "getCategories", null);
 exports.CategoriesController = CategoriesController = __decorate([
     (0, common_1.Controller)("categories"),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard, ip_adress_guard_1.IpGuard),
     (0, swagger_1.ApiTags)("Categories"),
     __metadata("design:paramtypes", [categories_service_1.CategoriesService])
 ], CategoriesController);

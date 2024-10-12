@@ -1,8 +1,9 @@
-import { Model } from 'sequelize-typescript';
-import { Comment } from './comment.model';
-import { Category } from './category.model';
+import { Model } from "sequelize-typescript";
+import { Comment } from "./comment.model";
+import { Category } from "./category.model";
 export declare class Product extends Model<Product> {
     name: object;
+    images: string[];
     description: object;
     price: number;
     categoryId: number;

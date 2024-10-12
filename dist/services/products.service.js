@@ -26,7 +26,7 @@ let ProductsService = class ProductsService {
         this.categoryModel = categoryModel;
         this.commentModel = commentModel;
     }
-    async create(name, description, price, categoryId, code, dimensions, cubicVolume, bruttoWeight, nettoWeight, minOrderQuantity) {
+    async create(name, description, price, categoryId, code, dimensions, cubicVolume, bruttoWeight, nettoWeight, minOrderQuantity, images) {
         return this.productModel.create({
             name,
             description,
@@ -38,6 +38,7 @@ let ProductsService = class ProductsService {
             bruttoWeight,
             nettoWeight,
             minOrderQuantity,
+            images,
         });
     }
     async findByCategory(categoryId, language, limit, offset) {
@@ -45,18 +46,18 @@ let ProductsService = class ProductsService {
             where: { id: categoryId },
         });
         if (!category) {
-            throw new common_1.NotFoundException('Category not found');
+            throw new common_1.NotFoundException("Category not found");
         }
         const products = await this.productModel.findAll({
             where: { categoryId: category.id },
-            include: [{ model: comment_model_1.Comment, as: 'comments' }],
+            include: [{ model: comment_model_1.Comment, as: "comments" }],
             limit,
             offset,
         });
         const localizedProducts = await Promise.all(products.map(async (product) => ({
             ...product.get(),
-            name: product.name[language] || product.name['uz'],
-            description: product.description[language] || product.description['uz'],
+            name: product.name[language] || product.name["uz"],
+            description: product.description[language] || product.description["uz"],
             code: product.code,
             dimensions: product.dimensions,
             cubicVolume: product.cubicVolume,
@@ -77,7 +78,7 @@ let ProductsService = class ProductsService {
         return {
             category: {
                 id: category.id,
-                name: category.name[language] || category.name['uz'],
+                name: category.name[language] || category.name["uz"],
                 parentId: category.parentId,
                 createdAt: category.createdAt,
                 updatedAt: category.updatedAt,
@@ -92,15 +93,15 @@ let ProductsService = class ProductsService {
                     [sequelize_2.Op.gt]: 0,
                 },
             },
-            include: [{ model: comment_model_1.Comment, as: 'comments' }],
-            order: [['salesCount', 'DESC']],
+            include: [{ model: comment_model_1.Comment, as: "comments" }],
+            order: [["salesCount", "DESC"]],
             limit,
             offset,
         });
         return await Promise.all(products.map(async (product) => ({
             ...product.get(),
-            name: product.name[language] || product.name['en'],
-            description: product.description[language] || product.description['en'],
+            name: product.name[language] || product.name["en"],
+            description: product.description[language] || product.description["en"],
             comments: await Promise.all(product.comments.map(async (comment) => ({
                 comment: comment.text,
                 grade: comment.grade,
@@ -120,7 +121,7 @@ let ProductsService = class ProductsService {
             await product.save();
         }
         else {
-            throw new Error('Product not found');
+            throw new Error("Product not found");
         }
     }
     async findTopViewed(limit, language, offset) {
@@ -130,15 +131,15 @@ let ProductsService = class ProductsService {
                     [sequelize_2.Op.gt]: 0,
                 },
             },
-            include: [{ model: comment_model_1.Comment, as: 'comments' }],
-            order: [['salesCount', 'DESC']],
+            include: [{ model: comment_model_1.Comment, as: "comments" }],
+            order: [["salesCount", "DESC"]],
             limit,
             offset,
         });
         return await Promise.all(products.map(async (product) => ({
             ...product.get(),
-            name: product.name[language] || product.name['en'],
-            description: product.description[language] || product.description['en'],
+            name: product.name[language] || product.name["en"],
+            description: product.description[language] || product.description["en"],
             comments: await Promise.all(product.comments.map(async (comment) => ({
                 comment: comment.text,
                 grade: comment.grade,
@@ -161,7 +162,7 @@ let ProductsService = class ProductsService {
         }
         const products = await this.productModel.findAll({
             where,
-            include: [{ model: comment_model_1.Comment, as: 'comments' }],
+            include: [{ model: comment_model_1.Comment, as: "comments" }],
             limit,
             offset,
             order: [[sortBy, sortOrder]],
@@ -170,8 +171,8 @@ let ProductsService = class ProductsService {
             const plainProduct = product.toJSON();
             return {
                 ...plainProduct,
-                name: plainProduct.name[language] || plainProduct.name['en'],
-                description: plainProduct.description[language] || plainProduct.description['en'],
+                name: plainProduct.name[language] || plainProduct.name["en"],
+                description: plainProduct.description[language] || plainProduct.description["en"],
                 bruttoWeight: plainProduct.bruttoWeight,
                 nettoWeight: plainProduct.nettoWeight,
             };
@@ -200,11 +201,11 @@ let ProductsService = class ProductsService {
         return products.map((product) => ({
             ...product,
             name: (product.name && product.name[language]) ||
-                product.name['en'] ||
-                'Unknown',
+                product.name["en"] ||
+                "Unknown",
             description: (product.description && product.description[language]) ||
-                product.description['en'] ||
-                'No description',
+                product.description["en"] ||
+                "No description",
         }));
     }
 };

@@ -19,6 +19,7 @@ const user_model_1 = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt_1 = require("@nestjs/jwt");
 const comment_model_1 = require("../models/comment.model");
+const console_1 = require("console");
 let UsersService = class UsersService {
     constructor(userModel, commentModel, jwtService) {
         this.userModel = userModel;
@@ -30,7 +31,7 @@ let UsersService = class UsersService {
         return this.userModel.create({
             username,
             password: hashedPassword,
-            role: 'admin',
+            role: "admin",
         });
     }
     async validate(username, password) {
@@ -40,10 +41,14 @@ let UsersService = class UsersService {
         }
         return null;
     }
-    login(user) {
-        const payload = { username: user.username, sub: user.id, role: user.role };
-        console.log(payload);
+    login(user, req) {
+        const ipAddress = req.ip || req.connection.remoteAddress;
+        (0, console_1.log)(ipAddress);
+        const payload = { username: user.username, sub: user.id, role: user.role, IPadress: ipAddress };
         return { access_token: this.jwtService.sign(payload) };
+    }
+    async getUserByID(userID) {
+        return this.userModel.findByPk(userID);
     }
     async getUserComments(userId) {
         return this.commentModel.findAll({
@@ -53,7 +58,7 @@ let UsersService = class UsersService {
     async changeLanguage(userId, language) {
         const user = await this.userModel.findByPk(userId);
         if (!user) {
-            throw new common_1.NotFoundException('User not found');
+            throw new common_1.NotFoundException("User not found");
         }
         user.language = language;
         await user.save();

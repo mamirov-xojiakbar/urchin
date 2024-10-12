@@ -10,9 +10,10 @@ import {
   ApiParam,
   ApiBody,
 } from "@nestjs/swagger";
+import { IpGuard } from "../guards/ip.adress.guard";
 
 @Controller("comments")
-@UseGuards(AuthGuard("jwt"), RolesGuard)
+@UseGuards(AuthGuard("jwt"), RolesGuard, IpGuard)
 @ApiTags("Comments") // Swagger grouping
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}

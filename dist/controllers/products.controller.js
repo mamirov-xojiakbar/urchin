@@ -19,12 +19,20 @@ const passport_1 = require("@nestjs/passport");
 const roles_guard_1 = require("../guards/roles.guard");
 const roles_decorator_1 = require("../decorators/roles.decorator");
 const swagger_1 = require("@nestjs/swagger");
+const ip_adress_guard_1 = require("../guards/ip.adress.guard");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
+const path_1 = require("path");
 let ProductsController = class ProductsController {
     constructor(productsService) {
         this.productsService = productsService;
     }
-    create(dto) {
-        return this.productsService.create(dto.name, dto.description, dto.price, dto.categoryId, dto.code, dto.dimensions, dto.cubicVolume, dto.bruttoWeight, dto.nettoWeight, dto.minOrderQuantity);
+    async create(dto, images) {
+        if (!images || images.length === 0) {
+            throw new common_1.BadRequestException("At least one image file is required.");
+        }
+        const imagePaths = images.map((file) => `uploads/products/${file.filename}`);
+        return this.productsService.create(dto.name, dto.description, dto.price, dto.categoryId, dto.code, dto.dimensions, dto.cubicVolume, dto.bruttoWeight, dto.nettoWeight, dto.minOrderQuantity, images);
     }
     async findByCategory(id, language, limit = 10, offset = 0) {
         return this.productsService.findByCategory(id, language, limit, offset);
@@ -59,44 +67,30 @@ let ProductsController = class ProductsController {
 exports.ProductsController = ProductsController;
 __decorate([
     (0, common_1.Post)("add"),
-    (0, roles_decorator_1.Roles)("admin"),
-    (0, swagger_1.ApiOperation)({ summary: "Create a new product" }),
-    (0, swagger_1.ApiBody)({
-        description: "Product details",
-        schema: {
-            type: "object",
-            properties: {
-                name: {
-                    type: "object",
-                    additionalProperties: { type: "string" },
-                    example: { en: "Phone", uz: "Telefon", ru: "Телефон" },
-                },
-                description: {
-                    type: "object",
-                    additionalProperties: { type: "string" },
-                    example: {
-                        en: "High quality phone",
-                        uz: "Yuqori sifatli telefon",
-                        ru: "Высококачественный телефон",
-                    },
-                },
-                price: { type: "number", example: 199.99 },
-                categoryId: { type: "number", example: 1 },
-                code: { type: "string", example: "P123" },
-                dimensions: { type: "string", example: "10x20x5cm" },
-                cubicVolume: { type: "number", example: 100 },
-                bruttoWeight: { type: "number", example: 1.5 },
-                nettoWeight: { type: "number", example: 1.4 },
-                minOrderQuantity: { type: "number", example: 1 },
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)("images", 10, {
+        storage: (0, multer_1.diskStorage)({
+            destination: "./uploads/products",
+            filename: (req, file, cb) => {
+                const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+                const ext = (0, path_1.extname)(file.originalname);
+                cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
             },
+        }),
+        limits: { fileSize: 2 * 1024 * 1024 },
+        fileFilter: (req, file, cb) => {
+            if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+                cb(new common_1.BadRequestException("Only image files are allowed!"), false);
+            }
+            else {
+                cb(null, true);
+            }
         },
-    }),
-    (0, swagger_1.ApiResponse)({ status: 201, description: "Product created successfully." }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: "Forbidden." }),
+    })),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)("category/:id"),
@@ -253,7 +247,7 @@ __decorate([
 ], ProductsController.prototype, "findTopRatedProducts", null);
 exports.ProductsController = ProductsController = __decorate([
     (0, common_1.Controller)("products"),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)("jwt"), roles_guard_1.RolesGuard, ip_adress_guard_1.IpGuard),
     (0, swagger_1.ApiTags)("Products"),
     __metadata("design:paramtypes", [products_service_1.ProductsService])
 ], ProductsController);

@@ -3,7 +3,7 @@ import { Product } from "../models/product.model";
 export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
-    create(dto: Record<string, any>): Promise<Product>;
+    create(dto: any, images: any): Promise<Product>;
     findByCategory(id: number, language: string, limit?: number, offset?: number): Promise<{
         category: {
             id: any;
@@ -28,6 +28,7 @@ export declare class ProductsController {
             }[];
             averageGrade: number;
             totalComments: number;
+            images: string[];
             price: number;
             categoryId: number;
             views: number;
@@ -56,6 +57,7 @@ export declare class ProductsController {
         }[];
         averageGrade: number;
         totalComments: number;
+        images: string[];
         price: number;
         categoryId: number;
         code: string;
@@ -92,6 +94,7 @@ export declare class ProductsController {
         }[];
         averageGrade: number;
         totalComments: number;
+        images: string[];
         price: number;
         categoryId: number;
         code: string;
@@ -120,6 +123,7 @@ export declare class ProductsController {
         description: any;
         bruttoWeight: number;
         nettoWeight: number;
+        images: string[];
         price: number;
         categoryId: number;
         code: string;

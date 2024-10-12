@@ -1,6 +1,14 @@
-import { Column, Model, Table, DataType, HasMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { Comment } from './comment.model';
-import { Category } from './category.model';
+import {
+  Column,
+  Model,
+  Table,
+  DataType,
+  HasMany,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
+import { Comment } from "./comment.model";
+import { Category } from "./category.model";
 
 @Table
 export class Product extends Model<Product> {
@@ -9,6 +17,12 @@ export class Product extends Model<Product> {
     allowNull: false,
   })
   name: object;
+
+  @Column({
+    type: DataType.JSONB,
+    allowNull: true,
+  })
+  images: string[];
 
   @Column({
     type: DataType.JSONB,
@@ -84,5 +98,3 @@ export class Product extends Model<Product> {
   @BelongsTo(() => Category)
   category: Category;
 }
-
-

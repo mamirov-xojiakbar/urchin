@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Param, Patch, Body } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Patch,
+  Body,
+  UseGuards,
+} from "@nestjs/common";
 import { OrdersService } from "../services/order.service";
 import {
   ApiTags,
@@ -7,13 +15,19 @@ import {
   ApiParam,
   ApiBody,
 } from "@nestjs/swagger";
+import { AuthGuard } from "@nestjs/passport";
+import { RolesGuard } from "../guards/roles.guard";
+import { IpGuard } from "../guards/ip.adress.guard";
+import { Roles } from "../decorators/roles.decorator";
 
 @Controller("orders")
+@UseGuards(AuthGuard("jwt"), RolesGuard, IpGuard)
 @ApiTags("Orders") // Swagger grouping
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post("create/:userId")
+  @Roles("user", "admin")
   @ApiOperation({ summary: "Create a new order for a user" })
   @ApiParam({ name: "userId", type: "integer", description: "ID of the user" })
   @ApiResponse({ status: 201, description: "Order created successfully." })
@@ -23,6 +37,7 @@ export class OrdersController {
   }
 
   @Get(":userId")
+  @Roles("user", "admin")
   @ApiOperation({ summary: "Get all orders for a user" })
   @ApiParam({ name: "userId", type: "integer", description: "ID of the user" })
   @ApiResponse({ status: 200, description: "Orders fetched successfully." })
@@ -32,6 +47,7 @@ export class OrdersController {
   }
 
   @Post("status/:orderId")
+  @Roles("user", "admin")
   @ApiOperation({ summary: "Update the status of an order" })
   @ApiParam({
     name: "orderId",
