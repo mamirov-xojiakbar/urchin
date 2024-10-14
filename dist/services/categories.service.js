@@ -29,19 +29,20 @@ let CategoriesService = class CategoriesService {
         const categories = await this.categoryModel.findAll({
             where: { parentId: null },
             include: [
-                { model: category_model_1.Category, as: 'subcategories' },
-                { model: product_model_1.Product, as: 'products' },
+                { model: category_model_1.Category, as: "subcategories" },
+                { model: product_model_1.Product, as: "products" },
             ],
         });
         const processedCategories = await Promise.all(categories.map(async (category) => {
             const products = await Promise.all(category.products.map(async (product) => ({
-                name: product.name[language] || product.name['uz'],
-                description: product.description[language] || product.description['uz'],
+                name: product.name[language] || product.name["uz"],
+                description: product.description[language] || product.description["uz"],
                 price: product.price,
                 categoryId: product.categoryId,
             })));
             return {
-                name: category.name[language] || category.name['uz'],
+                id: category.id,
+                name: category.name[language] || category.name["uz"],
                 products,
                 subcategories: await this.getCategoriesForCategory(category.id, language),
             };
@@ -51,17 +52,17 @@ let CategoriesService = class CategoriesService {
     async getCategoriesForCategory(parentId, language) {
         const categories = await this.categoryModel.findAll({
             where: { parentId },
-            include: [{ model: product_model_1.Product, as: 'products' }],
+            include: [{ model: product_model_1.Product, as: "products" }],
         });
         const processedCategories = await Promise.all(categories.map(async (category) => {
             const products = await Promise.all(category.products.map(async (product) => ({
-                name: product.name[language] || product.name['uz'],
-                description: product.description[language] || product.description['uz'],
+                name: product.name[language] || product.name["uz"],
+                description: product.description[language] || product.description["uz"],
                 price: product.price,
                 categoryId: product.categoryId,
             })));
             return {
-                name: category.name[language] || category.name['uz'],
+                name: category.name[language] || category.name["uz"],
                 products,
                 subcategories: await this.getCategoriesForCategory(category.id, language),
             };

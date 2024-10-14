@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { Request } from "express";
 import { JwtService } from "@nestjs/jwt";
+import { log } from "console";
 
 @Injectable()
 export class IpGuard implements CanActivate {

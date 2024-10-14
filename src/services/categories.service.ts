@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Category } from '../models/category.model';
-import { Product } from '../models/product.model';
-import { log } from 'console';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/sequelize";
+import { Category } from "../models/category.model";
+import { Product } from "../models/product.model";
+import { log } from "console";
 
 @Injectable()
 export class CategoriesService {
@@ -17,8 +17,8 @@ export class CategoriesService {
     const categories = await this.categoryModel.findAll({
       where: { parentId: null },
       include: [
-        { model: Category, as: 'subcategories' },
-        { model: Product, as: 'products' },
+        { model: Category, as: "subcategories" },
+        { model: Product, as: "products" },
       ],
     });
 
@@ -27,23 +27,24 @@ export class CategoriesService {
       categories.map(async (category) => {
         const products = await Promise.all(
           category.products.map(async (product) => ({
-            name: product.name[language] || product.name['uz'],
+            name: product.name[language] || product.name["uz"],
             description:
-              product.description[language] || product.description['uz'],
+              product.description[language] || product.description["uz"],
             price: product.price,
             categoryId: product.categoryId,
-          })),
+          }))
         );
 
         return {
-          name: category.name[language] || category.name['uz'],
+          id: category.id,
+          name: category.name[language] || category.name["uz"],
           products,
           subcategories: await this.getCategoriesForCategory(
             category.id,
-            language,
+            language
           ),
         };
-      }),
+      })
     );
 
     return processedCategories;
@@ -51,11 +52,11 @@ export class CategoriesService {
 
   private async getCategoriesForCategory(
     parentId: number,
-    language: string,
+    language: string
   ): Promise<any> {
     const categories = await this.categoryModel.findAll({
       where: { parentId },
-      include: [{ model: Product, as: 'products' }],
+      include: [{ model: Product, as: "products" }],
     });
 
     // Process categories and products
@@ -63,23 +64,23 @@ export class CategoriesService {
       categories.map(async (category) => {
         const products = await Promise.all(
           category.products.map(async (product) => ({
-            name: product.name[language] || product.name['uz'],
+            name: product.name[language] || product.name["uz"],
             description:
-              product.description[language] || product.description['uz'],
+              product.description[language] || product.description["uz"],
             price: product.price,
             categoryId: product.categoryId,
-          })),
+          }))
         );
 
         return {
-          name: category.name[language] || category.name['uz'],
+          name: category.name[language] || category.name["uz"],
           products,
           subcategories: await this.getCategoriesForCategory(
             category.id,
-            language,
+            language
           ),
         };
-      }),
+      })
     );
 
     return processedCategories;
